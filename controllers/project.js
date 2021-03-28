@@ -2,6 +2,7 @@
 
 let Project = require('../models/project');
 let fs = require('fs');
+let path = require('path');
 
 let controller = {}
 
@@ -130,5 +131,20 @@ controller.uploadImage = (req,res) => {
             message: fileName
         })
     }
+}
+//! Tiene bug
+controller.showImages = (req,res) => {
+    
+    Project.find({"image":{$exists:true, $ne: null}}).exec((err, docs) => {
+        if(err) return res.status(500).send({message:err});
+
+        if(!docs) return res.status(404).send({message: 'No hay projectos'});
+        
+        for(let i of docs){  
+            res.sendFile(path.resolve(`uploads/${i.image}`))
+        }
+            
+    });
+
 }
 module.exports = controller;
